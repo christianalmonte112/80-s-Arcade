@@ -1,9 +1,6 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from app.api.routes import auth
 
 app = FastAPI(
     title="80s Arcade API",
@@ -12,15 +9,16 @@ app = FastAPI(
 )
 
 # CORS configuration
-origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 
 @app.get("/")
 def read_root():
@@ -34,10 +32,5 @@ def read_root():
 def health_check():
     return {
         "status": "healthy",
-        "database": "not_connected_yet"
+        "database": "connected"
     }
-
-# Import routes here later
-# from app.api.routes import auth, tetris, profile, friends
-# app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-# app.include_router(tetris.router, prefix="/api/tetris", tags=["tetris"])
